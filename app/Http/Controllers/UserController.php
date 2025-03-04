@@ -9,17 +9,26 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(){
-        $user = UserModel::firstOrNew(
+        $user = UserModel::create(
             [
-                'username' => 'manager33', 
-                'nama' => 'Manager Tiga Tiga',
+                'username' => 'manager5', 
+                'nama' => 'Manager5',
                 'password' => Hash::make('12345'),
                 'level_id' => 2
             ],
         );
+        $user->username = 'manager10';
+
         $user->save();
 
-        return view('user.index', ['data' => $user]);
+        $user->wasChanged();
+        $user->wasChanged('username');
+        $user->wasChanged(['username', 'level_id']);
+        $user->wasChanged('nama');
+        $user->wasChanged('nama');
+        dd($user->wasChanged(['nama', 'username']));
+
+        // return view('user.index', ['data' => $user]);
     }
     
 }
