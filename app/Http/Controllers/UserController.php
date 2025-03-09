@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(){
-        $user = UserModel::all();
-        return view('user.index', ['data' => $user]);
+        $user = UserModel::with('level')->get();
+        return view('user.user_index', ['data' => $user]);
     }
     
     public function tambah(){
@@ -44,8 +44,6 @@ class UserController extends Controller
     }
 
     public function hapus($user_id){
-        $user = UserModel::find($user_id);
-        $user->delete();
-        return redirect('/user');
+        
     }
 }
