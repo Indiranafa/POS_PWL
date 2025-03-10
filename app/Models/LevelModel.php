@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class LevelModel extends Model
 {
-    public function level(): HasOne{
-        return $this->hasOne(UserModel::class, 'level_id', 'level_id');
-    }
+    protected $table = 'm_level';
+    protected $primaryKey = 'level_id';
 }
