@@ -152,6 +152,13 @@ class UserController extends Controller
         return view('user.show', ['breadcrumb' => $breadcrumb,'page' => $page, 'user' => $user, 'activeMenu' => $activeMenu]);
     }
 
+    public function show_ajax(string $id){
+        $user = UserModel::find($id);
+        $level = LevelModel::select('level_id', 'level_nama')->get();
+
+        return view('user.show_ajax',['user' => $user, 'level' => $level]);
+    }
+
     public function edit(string $id){
         $user = UserModel::find($id);
         $level = LevelModel::all();
@@ -231,12 +238,12 @@ class UserController extends Controller
                 ]);
             }
         }
-        return redirect('/');
+        return redirect('/user');
     }
 
     public function destroy(string $id){
-        $check = UserModel::find($id);
-        if (!$check) {
+        $user = UserModel::find($id);
+        if (!$user) {
             return redirect('/user')->with('error', 'Data user tidak ditemukan');
         }
         try {
@@ -245,5 +252,30 @@ class UserController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect('/user')->with('error', 'Data user gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');;
         }
+    }
+
+    public function confirm_ajax(string $id){
+        $user = UserModel::find($id);
+
+        return view('user.confirm_ajax', ['user' => $user]);
+    }
+
+    public function delete_ajax(Request $request, $id){
+        if ($request->ajax() || $request->wantsJson()) {
+            $user = UserModel::find($id);
+            if ($user) {
+                $user->delete();
+                return response()->json([
+                    'status'    => true,
+                    'message'   => 'Data berhasil dihapus'
+                ]);
+            }else{
+                return response()->json([
+                    'status'    => false,
+                    'message'   => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/user');
     }
 }
