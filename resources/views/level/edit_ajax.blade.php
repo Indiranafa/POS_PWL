@@ -1,46 +1,43 @@
-@empty($kategori)
+@empty($level)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Kesalahan</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
-                    Data kategori tidak ditemukan.
+                    <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
+                    Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('kategori') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/level') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ url('/kategori/' . $kategori->kategori_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/level/' . $level->level_id.'/update_ajax') }}" method="POST" id="form-edit-level">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Data Kategori</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Level</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Input Kode Kategori -->
                     <div class="form-group">
-                        <label>Kode Kategori</label>
-                        <input type="text" name="kategori_kode" id="kategori_kode" class="form-control"
-                               value="{{ $kategori->kategori_kode }}" required>
-                        <small id="error-kategori_kode" class="error-text form-text text-danger"></small>
+                        <label>Kode Level</label>
+                        <input value="{{ $level->level_kode }}" type="text" name="level_kode" id="level_kode" class="form-control" required>
+                        <small id="error-level_kode" class="error-text form-text text-danger"></small>
                     </div>
-                    <!-- Input Nama Kategori -->
                     <div class="form-group">
-                        <label>Nama Kategori</label>
-                        <input type="text" name="kategori_nama" id="kategori_nama" class="form-control"
-                               value="{{ $kategori->kategori_nama }}" required>
-                        <small id="error-kategori_nama" class="error-text form-text text-danger"></small>
+                        <label>Nama Level</label>
+                        <input value="{{ $level->level_nama }}" type="text" name="level_nama" id="level_nama" class="form-control" required>
+                        <small id="error-level_nama" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -50,36 +47,31 @@
             </div>
         </div>
     </form>
-
     <script>
-        $(document).ready(function () {
-            // Validasi form edit menggunakan jQuery Validate
-            $("#form-edit").validate({
+        $(document).ready(function() {
+            $("#form-edit-level").validate({
                 rules: {
-                    kategori_kode: {required: true, maxlength: 50},
-                    kategori_nama: {required: true, maxlength: 100}
+                    level_kode: {required: true, minlength: 2, maxlength: 50},
+                    level_nama: {required: true, minlength: 3, maxlength: 50}
                 },
-                submitHandler: function (form) {
-                    // Kirim data via AJAX
+                submitHandler: function(form) {
                     $.ajax({
                         url: form.action,
                         type: form.method,
                         data: $(form).serialize(),
-                        success: function (response) {
-                            if (response.status) {
+                        success: function(response) {
+                            if(response.status){
                                 $('#myModal').modal('hide');
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                if (window.dataKategori) {
-                                    window.dataKategori.ajax.reload();
-                                }
-                            } else {
+                                dataLevel.ajax.reload();
+                            }else{
                                 $('.error-text').text('');
-                                $.each(response.msgField, function (prefix, val) {
-                                    $('#error-' + prefix).text(val[0]);
+                                $.each(response.msgField, function(prefix, val) {
+                                    $('#error-'+prefix).text(val[0]);
                                 });
                                 Swal.fire({
                                     icon: 'error',
@@ -87,11 +79,9 @@
                                     text: response.message
                                 });
                             }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error(error);
                         }
                     });
+                    return false;
                 },
                 errorElement: 'span',
                 errorPlacement: function (error, element) {

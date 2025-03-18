@@ -260,22 +260,32 @@ class UserController extends Controller
         return view('user.confirm_ajax', ['user' => $user]);
     }
 
-    public function delete_ajax(Request $request, $id){
-        if ($request->ajax() || $request->wantsJson()) {
+    public function delete_ajax(Request $request, $id)
+    {
+        //cek apakah req dari ajax
+        if($request->ajax() || $request->wantsJson()){
             $user = UserModel::find($id);
-            if ($user) {
-                $user->delete();
+            if($user){
+                try {
+                    $user->delete();
                 return response()->json([
-                    'status'    => true,
-                    'message'   => 'Data berhasil dihapus'
+                    'status'=> true,
+                    'message'=> 'Data berhasil dihapus'
                 ]);
+                } catch (\Throwable $th) {
+                return response()->json([
+                    'status'=> false,
+                    'message'=> 'Data tidak bisa dihapus'
+                ]);
+                }
+                
             }else{
                 return response()->json([
-                    'status'    => false,
-                    'message'   => 'Data tidak ditemukan'
+                    'status'=> false,
+                    'message'=> 'Data tidak ditemuka'
                 ]);
             }
-        }
-        return redirect('/user');
+        } 
+        return redirect('/');   
     }
 }
