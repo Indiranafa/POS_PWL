@@ -12,7 +12,7 @@ class BarangController extends Controller
 {
     public function index()
     {
-        $breadcrumbs = (object)[
+        $breadcrumb = (object)[
             'title' => 'Daftar Barang',
             'list' => ['Home', 'Barang']
         ];
@@ -25,7 +25,7 @@ class BarangController extends Controller
 
         $kategori = KategoriModel::all();
 
-        return view('barang.index', compact('breadcrumbs', 'page', 'activeMenu', 'kategori'));
+        return view('barang.index', compact('breadcrumb', 'page', 'activeMenu', 'kategori'));
     }
 
     public function list(Request $request)

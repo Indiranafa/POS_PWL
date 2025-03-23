@@ -10,7 +10,7 @@ class PenjualanController extends Controller
 {
     public function index()
     {
-        $breadcrumbs = (object)[
+        $breadcrumb = (object)[
             'title' => 'Daftar Penjualan',
             'list'  => ['Home', 'Penjualan']
         ];
@@ -21,7 +21,7 @@ class PenjualanController extends Controller
 
         $activeMenu = 'penjualan';
 
-        return view('penjualan.index', compact('breadcrumbs', 'page', 'activeMenu'));
+        return view('penjualan.index', compact('breadcrumb', 'page', 'activeMenu'));
     }
 
     public function list(Request $request)
@@ -50,7 +50,7 @@ class PenjualanController extends Controller
         // Memuat data penjualan beserta relasi user dan detail (beserta barang)
         $penjualan = PenjualanModel::with(['user', 'detail.barang'])->find($id);
 
-        $breadcrumbs = (object)[
+        $breadcrumb = (object)[
             'title' => 'Detail Penjualan',
             'list'  => ['Home', 'Penjualan', 'Detail']
         ];
@@ -61,7 +61,7 @@ class PenjualanController extends Controller
 
         $activeMenu = 'penjualan';
 
-        return view('penjualan.detail.index', compact('penjualan', 'breadcrumbs', 'page', 'activeMenu'));
+        return view('penjualan.detail.index', compact('penjualan', 'breadcrumb', 'page', 'activeMenu'));
     }
 
     public function destroy($id)

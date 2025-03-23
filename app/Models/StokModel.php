@@ -13,12 +13,7 @@ class StokModel extends Model
     protected $primaryKey = 'stok_id';
     public $timestamps = true;
 
-    protected $fillable = [
-        'supplier_id',
-        'user_id',
-        'barang_id',
-        'stok_tanggal',
-        'stok_jumlah'
+    protected $fillable = ['supplier_id','user_id','barang_id','stok_tanggal','stok_jumlah'
     ];
 
     public function supplier()

@@ -1,15 +1,15 @@
-@if(is_null($barang))
+@if(is_null($penjualan))
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
-                    Data barang tidak ditemukan.
+                    Data penjualan tidak ditemukan.
                 </div>
             </div>
             <div class="modal-footer">
@@ -18,29 +18,35 @@
         </div>
     </div>
 @else
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
+            <!-- Header Modal -->
             <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Hapus Barang</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title">Konfirmasi Hapus Penjualan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <!-- Body Modal -->
             <div class="modal-body">
-                Apakah Anda yakin ingin menghapus barang <strong>{{ $barang->barang_nama }}</strong>?
+                Apakah Anda yakin ingin menghapus penjualan dengan kode
+                <strong>{{ $penjualan->penjualan_kode }}</strong>?
             </div>
+            <!-- Footer Modal -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
-                <button type="button" onclick="deleteBarang('{{ $barang->barang_id }}')" class="btn btn-danger">Hapus
+                <button type="button" onclick="deletePenjualan('{{ $penjualan->penjualan_id }}')"
+                        class="btn btn-danger">Hapus
                 </button>
             </div>
         </div>
     </div>
+
     <script>
-        function deleteBarang(id) {
+        function deletePenjualan(id) {
             Swal.fire({
                 title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menghapus barang ini?',
+                text: 'Apakah Anda yakin ingin menghapus penjualan ini?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, hapus!',
@@ -48,10 +54,10 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/barang/' + id + '/delete_ajax',  // Pastikan route DELETE /barang/{id}/delete_ajax sudah terdefinisi
+                        url: '/penjualan/' + id + '/delete_ajax', // Pastikan route DELETE /penjualan/{id}/delete_ajax sudah didefinisikan
                         type: 'DELETE',
                         data: {
-                            _token: '{{ csrf_token() }}'  // Sertakan CSRF token
+                            _token: '{{ csrf_token() }}'
                         },
                         success: function (response) {
                             if (response.status) {
@@ -61,9 +67,8 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                // Reload DataTable barang (pastikan variabel global dataBarang telah dideklarasikan)
-                                if (window.dataBarang) {
-                                    window.dataBarang.ajax.reload();
+                                if (window.dataPenjualan) {
+                                    window.dataPenjualan.ajax.reload();
                                 }
                             } else {
                                 Swal.fire({
@@ -78,7 +83,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: 'Gagal menghapus barang.'
+                                text: 'Gagal menghapus penjualan.'
                             });
                         }
                     });
