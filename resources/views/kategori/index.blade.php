@@ -68,7 +68,7 @@
                 serverSide: true,
                 processing: true,
                 ajax: {
-                    url: "{{ route('kategori.list') }}",
+                    url: "{{ url('/kategori/list') }}",
                     type: "POST",
                     data: function (d) {
                         d.kategori_id = $('#kategori_id').val();

@@ -20,7 +20,6 @@
                     <th>Penjualan Kode</th>
                     <th>Pembeli</th>
                     <th>Tanggal</th>
-                    <th>Total Harga</th>
                     <th>User</th>
                     <th>Aksi</th>
                 </tr>
@@ -48,7 +47,6 @@
                     { data: "penjualan_kode", orderable: true, searchable: true },
                     { data: "pembeli", orderable: true, searchable: true },
                     { data: "penjualan_tanggal", orderable: true, searchable: true },
-                    { data: "total_harga", orderable: true, searchable: true },
                     { data: "user_name", orderable: false, searchable: false },
                     { data: "aksi", className: "text-center", orderable: false, searchable: false }
                 ]

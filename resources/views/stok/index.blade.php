@@ -78,7 +78,7 @@
                 serverSide: true,
                 processing: true,
                 ajax: {
-                    url: "{{ route('stok.list') }}",
+                    url: "{{ url('/stok/list') }}",
                     type: "POST",
                     data: function (d) {
                         d.barang_id = $('#barang_id').val();
