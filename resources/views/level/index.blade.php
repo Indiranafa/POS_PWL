@@ -1,13 +1,22 @@
 @extends('layouts.template')
 
 @section('content')
-    <div class="card card-outline card-primary">
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
                 <button onclick="modalAction('{{ url('level/create_ajax') }}')" class="btn btn-sm btn-success mt-1">
                     Tambah Ajax
                 </button>
+                <button onclick="modalAction('{{ url('level/import') }}')" class="btn btn-sm btn-info mt-1">
+                    <i class="fa fa-file-excel mr-1"></i>Import Level
+                </button>
+                <a href="{{ url('/level/export_excel') }}" class="btn btn-sm btn-primary mt-1">
+                    <i class="fa fa-file-excel mr-1"></i>Export Level
+                </a>
+                <a href="{{ url('/level/export_pdf') }}" class="btn btn-sm btn-warning mt-1">
+                    <i class="fa fa-file-pdf mr-1"></i> Export Level
+                </a>
             </div>
         </div>
         <div class="card-body">

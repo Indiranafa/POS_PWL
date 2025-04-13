@@ -133,5 +133,23 @@
         </a>
       </li>
     </ul>
+    <!-- Profile -->
+    <a href="{{ route('profile.index') }}">
+      @if(auth()->user()->foto)
+          <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}"
+              class="img-circle"
+              alt="User Image"
+              width="35"
+              height="35"
+              style="margin-top: 5px;">
+      @else
+          <img src="{{ asset('adminlte/dist/img/user2-160x160.jpg') }}"
+              class="img-circle"
+              alt="Default User"
+              width="35"
+              height="35"
+              style="margin-top: 5px;">
+      @endif
+    </a>
   </nav>
   <!-- /.navbar -->
