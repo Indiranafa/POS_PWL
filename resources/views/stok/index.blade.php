@@ -7,7 +7,7 @@
             <div class="card-tools">
                 <!-- Tombol untuk membuka form create stok via AJAX -->
                 <button onclick="modalAction('{{ url('stok/create_ajax') }}')" class="btn btn-sm btn-success mt-1">
-                    Tambah Ajax
+                    Tambah Data Stok
                 </button>
             </div>
         </div>

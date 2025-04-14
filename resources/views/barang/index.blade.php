@@ -4,10 +4,16 @@
         <div class="card-header">
             <h3 class="card-title">Daftar barang</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-info">Import Barang</button>
-                <a href="{{ url('/barang/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i>Export Barang</a>
-                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-success">Tambah Data (Ajax)</button>
-                <a href="{{ url('/barang/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i> Export Barang </a>
+                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Data Barang</button>
+                <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-sm btn-info mt-1">
+                    <i class="fa fa-file-excel mr-1"></i>Import Data Barang
+                </button>
+                <a href="{{ url('/barang/export_excel') }}" class="btn btn-sm btn-primary mt-1">
+                    <i class="fa fa-file-excel mr-1"></i> Export Excel
+                </a>
+                <a href="{{ url('/barang/export_pdf') }}" class="btn btn-sm btn-warning mt-1">
+                    <i class="fa fa-file-pdf mr-1"></i> Export PDF
+                </a>
             </div>
         </div>
         <div class="card-body">

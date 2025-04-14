@@ -32,6 +32,7 @@ class ProfileController extends Controller
             Storage::delete("public/foto/{$user->foto}");
         }
 
+        /** @var \App\Models\User $user **/
         // Simpan foto baru
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('public/foto');

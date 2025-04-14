@@ -302,7 +302,7 @@ class UserController extends Controller
 
     //import ajax
     public function import_ajax(Request $request) 
-   { 
+    { 
        if($request->ajax() || $request->wantsJson()){ 
            $rules = [ 
                // validasi file harus xls atau xlsx, max 1MB 
@@ -318,14 +318,14 @@ class UserController extends Controller
                ]); 
            } 
            
-           $file = $request->file('file_user');  // ambil file dari request 
+           $file = $request->file('file_user'); // ambil file dari request 
 
-           $reader = IOFactory::createReader('Xlsx');  // load reader file excel 
-           $reader->setReadDataOnly(true);             // hanya membaca data 
+           $reader = IOFactory::createReader('Xlsx'); // load reader file excel 
+           $reader->setReadDataOnly(true); // hanya membaca data 
            $spreadsheet = $reader->load($file->getRealPath()); // load file excel 
-           $sheet = $spreadsheet->getActiveSheet();    // ambil sheet yang aktif 
+           $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif 
 
-           $data = $sheet->toArray(null, false, true, true);   // ambil data excel 
+           $data = $sheet->toArray(null, false, true, true); // ambil data excel 
 
            $insert = []; 
            if(count($data) > 1){ // jika data lebih dari 1 baris 
@@ -333,10 +333,10 @@ class UserController extends Controller
                    if($baris > 1){ // baris ke 1 adalah header, maka lewati 
                        $insert[] = [ 
                             'level_id' =>$value['A'],
-                           'username' => $value['B'], 
-                           'nama' => $value['C'], 
-                           'created_at' => now(),
-                           'updated_at' => now() 
+                            'username' => $value['B'], 
+                            'nama' => $value['C'], 
+                            'created_at' => now(),
+                            'updated_at' => now() 
                        ]; 
                    } 
                } 

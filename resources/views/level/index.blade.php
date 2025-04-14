@@ -6,16 +6,16 @@
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
                 <button onclick="modalAction('{{ url('level/create_ajax') }}')" class="btn btn-sm btn-success mt-1">
-                    Tambah Ajax
+                    Tambah Data Level
                 </button>
                 <button onclick="modalAction('{{ url('level/import') }}')" class="btn btn-sm btn-info mt-1">
-                    <i class="fa fa-file-excel mr-1"></i>Import Level
+                    <i class="fa fa-file-excel mr-1"></i>Import Data Level
                 </button>
                 <a href="{{ url('/level/export_excel') }}" class="btn btn-sm btn-primary mt-1">
-                    <i class="fa fa-file-excel mr-1"></i>Export Level
+                    <i class="fa fa-file-excel mr-1"></i>Export Excel
                 </a>
                 <a href="{{ url('/level/export_pdf') }}" class="btn btn-sm btn-warning mt-1">
-                    <i class="fa fa-file-pdf mr-1"></i> Export Level
+                    <i class="fa fa-file-pdf mr-1"></i> Export PDF
                 </a>
             </div>
         </div>

@@ -78,8 +78,8 @@
 <body>
     <table class="border-bottom-header">
         <tr>
-            <td width="15%" class="text-center"><img src="{{ public_path('assets/images/polinema-bw.png') }}"
-                    class="image">
+            <td width="15%" class="text-center"><img src="{{ public_path('logo_polinema.png') }}" class="image">
+
             </td>
 
             <td width="85%">
