@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 
 class StokController extends Controller
 {
@@ -55,7 +60,7 @@ class StokController extends Controller
             })
             ->addColumn('aksi', function ($stok) {
                 $btn  = '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                // $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
@@ -203,5 +208,149 @@ class StokController extends Controller
             }
         }
         return redirect('/');
+    }
+
+    public function import()
+    {
+        return view('stok.import');
+    }
+
+    //import ajax
+    public function import_ajax(Request $request) 
+    { 
+       if($request->ajax() || $request->wantsJson()){ 
+           $rules = [ 
+               // validasi file harus xls atau xlsx, max 1MB 
+               'file_stok' => ['required', 'mimes:xlsx', 'max:1024'] 
+           ]; 
+
+           $validator = Validator::make($request->all(), $rules); 
+           if($validator->fails()){ 
+               return response()->json([ 
+                   'status' => false, 
+                   'message' => 'Validasi Gagal', 
+                   'msgField' => $validator->errors() 
+               ]); 
+           } 
+           
+           $file = $request->file('file_stok');  // ambil file dari request 
+
+           $reader = IOFactory::createReader('Xlsx');  // load reader file excel 
+           $reader->setReadDataOnly(true);             // hanya membaca data 
+           $spreadsheet = $reader->load($file->getRealPath()); // load file excel 
+           $sheet = $spreadsheet->getActiveSheet();    // ambil sheet yang aktif 
+
+           $data = $sheet->toArray(null, false, true, true);   // ambil data excel 
+
+           $insert = []; 
+           if(count($data) > 1){ // jika data lebih dari 1 baris 
+               foreach ($data as $baris => $value) { 
+                   if($baris > 1){ // baris ke 1 adalah header, maka lewati 
+                       $insert[] = [
+                           'barang_id' => $value['A'],
+                            'user_id' => $value['B'],
+                            'stok_tanggal' => $value['C'],
+                            'stok_jumlah'  => $value['D'],
+                            'created_at'  => now(), 
+                       ]; 
+                   } 
+               } 
+
+               if(count($insert) > 0){ 
+                   // insert data ke database, jika data sudah ada, maka diabaikan 
+                   StokModel::insertOrIgnore($insert);    
+               } 
+
+               return response()->json([ 
+                   'status' => true, 
+                   'message' => 'Data berhasil diimport' 
+               ]); 
+           }else{ 
+               return response()->json([ 
+                   'status' => false, 
+                   'message' => 'Tidak ada data yang diimport' 
+               ]); 
+           } 
+       } 
+       return redirect('/'); 
+   }
+
+    public function export_excel()
+    {
+        // Ambil data stok yang akan diexport
+        $stok = StokModel::with(['barang', 'user'])
+            ->orderBy('stok_tanggal', 'desc')
+            ->get();
+
+        // Buat objek Spreadsheet baru
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom (baris pertama)
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Barang');
+        $sheet->setCellValue('C1', 'Tanggal Stok');
+        $sheet->setCellValue('D1', 'Jumlah');
+        $sheet->setCellValue('E1', 'Yang Mencatat');
+
+        // Buat header bold
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        // Isi data stok
+        $no = 1;
+        $row = 2;
+        foreach ($stok as $item) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $item->barang->barang_nama ?? '-');
+            $sheet->setCellValue('C' . $row, $item->stok_tanggal);
+            $sheet->setCellValue('D' . $row, $item->stok_jumlah);
+            $sheet->setCellValue('E' . $row, $item->user->nama ?? '-');
+
+            $no++;
+            $row++;
+        }
+
+        // Set auto-size untuk setiap kolom
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Beri judul sheet
+        $sheet->setTitle('Data stok');
+
+        // Buat writer untuk file Excel
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data stok ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        // Atur header untuk file download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        // Output ke browser
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        // Ambil data stok
+        $stok = StokModel::select('barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
+            ->orderBy('stok_tanggal', 'desc')
+            ->with(['barang.kategori', 'user'])
+            ->get();
+
+        // Muat view export PDF (sesuaikan nama file view jika diperlukan)
+        $pdf = Pdf::loadView('stok.export_pdf', ['stok' => $stok]);
+
+        $pdf->setPaper('a4', 'portrait');       // Set ukuran kertas dan orientasi
+        $pdf->setOption("isRemoteEnabled", true); // Aktifkan remote jika ada gambar dari URL
+
+        return $pdf->stream('Data stok ' . date('Y-m-d H:i:s') . '.pdf');
     }
 }

@@ -9,6 +9,15 @@
                 <button onclick="modalAction('{{ url('stok/create_ajax') }}')" class="btn btn-sm btn-success mt-1">
                     Tambah Data Stok
                 </button>
+                <button onclick="modalAction('{{ url('stok/import') }}')" class="btn btn-sm btn-info mt-1">
+                    <i class="fa fa-file-excel mr-1"></i>Import Data Stok
+                </button>
+                <a href="{{ url('/stok/export_excel') }}" class="btn btn-sm btn-primary mt-1">
+                    <i class="fa fa-file-excel mr-1"></i>Export Excel
+                </a>
+                <a href="{{ url('/stok/export_pdf') }}" class="btn btn-sm btn-warning mt-1">
+                    <i class="fa fa-file-pdf mr-1"></i> Export PDF
+                </a>
             </div>
         </div>
         <div class="card-body">
@@ -41,7 +50,7 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>ID Barang</th>
+                    {{-- <th>ID Barang</th> --}}
                     <th>Nama Barang</th>
                     <th>Jumlah Stok</th>
                     <th>Tanggal Stok</th>
@@ -86,7 +95,7 @@
                 },
                 columns: [
                     {data: "DT_RowIndex", className: "text-center", orderable: false, searchable: false},
-                    {data: "barang_id", orderable: true, searchable: true},
+                    // {data: "barang_id", orderable: true, searchable: true},
                     {data: "barang_nama", orderable: true, searchable: true},
                     {data: "stok_jumlah", orderable: true, searchable: false},
                     {data: "stok_tanggal", orderable: true, searchable: false},

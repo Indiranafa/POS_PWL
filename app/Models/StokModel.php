@@ -26,6 +26,7 @@ class StokModel extends Model
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
+
     public function barang()
     {
         return $this->belongsTo(BarangModel::class, 'barang_id', 'barang_id');
