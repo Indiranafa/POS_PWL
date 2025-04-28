@@ -44,6 +44,11 @@ class PenjualanController extends Controller
             ->addColumn('user_name', function ($penjualan) {
                 return $penjualan->user ? $penjualan->user->nama : '-';
             })
+            ->addColumn('harga_total', function ($row) {
+                return 'Rp ' . number_format($row->detail->sum(function ($d) {
+                    return $d->jumlah * $d->harga;
+                }), 0, ',', '.');
+            })            
             ->addColumn('aksi', function ($penjualan) {
                 $btn  = '<button onclick="modalAction(\'' . url('/penjualan/' . $penjualan->penjualan_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/penjualan/' . $penjualan->penjualan_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
@@ -76,95 +81,94 @@ class PenjualanController extends Controller
 
     public function store_ajax(Request $request)
     {
-    $request->validate([
-        'pembeli' => 'required|string|max:100',
-        'penjualan_tanggal' => 'required|date',
-        'barang_id' => 'required|array',
-        'barang_id.*' => 'required|exists:m_barang,barang_id',
-        'jumlah' => 'required|array',
-        'jumlah.*' => 'required|integer|min:1'
-    ]);
-
-    $tanggalLengkap = Carbon::parse($request->penjualan_tanggal)
-        ->setTimeFromTimeString(now()->format('H:i:s'));
-
-    DB::beginTransaction();
-    try {
-        $penjualan = PenjualanModel::create([
-            'pembeli' => $request->pembeli,
-            'penjualan_kode' => 'PJ' . time(),
-            'penjualan_tanggal' => $tanggalLengkap,
-            'created_at' => now(),
-            'user_id' => auth()->id(),
+        $request->validate([
+            'pembeli' => 'required|string|max:100',
+            'penjualan_tanggal' => 'required|date',
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'required|exists:m_barang,barang_id',
+            'jumlah' => 'required|array',
+            'jumlah.*' => 'required|integer|min:1'
         ]);
 
-        foreach ($request->barang_id as $i => $barang_id) {
-            $barang = BarangModel::findOrFail($barang_id);
+        $tanggalLengkap = Carbon::parse($request->penjualan_tanggal)
+            ->setTimeFromTimeString(now()->format('H:i:s'));
 
-            // Ambil total stok dari tabel stok
-            $stokTersedia = StokModel::where('barang_id', $barang_id)->sum('stok_jumlah');
+        DB::beginTransaction();
+        try {
+            $penjualan = PenjualanModel::create([
+                'pembeli' => $request->pembeli,
+                'penjualan_kode' => 'PJ' . time(),
+                'penjualan_tanggal' => $tanggalLengkap,
+                'created_at' => now(),
+                'user_id' => auth()->id(),
+            ]);
 
-            if ($stokTersedia < $request->jumlah[$i]) {
-                DB::rollBack();
-                return response()->json([
-                    'status' => false,
-                    'message' => "Stok barang '{$barang->barang_nama}' tidak mencukupi! (Tersedia: $stokTersedia, Diminta: {$request->jumlah[$i]})"
-                ], 422);
-            }
+            foreach ($request->barang_id as $i => $barang_id) {
+                $barang = BarangModel::findOrFail($barang_id);
 
+                // Ambil total stok dari tabel stok
+                $stokTersedia = StokModel::where('barang_id', $barang_id)->sum('stok_jumlah');
 
-            // Cari entri stok terakhir untuk barang ini
-            $latestStok = StokModel::where('barang_id', $barang_id)
-                ->latest('stok_tanggal')
-                ->first();
-
-            if ($latestStok && $latestStok->stok_jumlah > 0) {
-                if ($request->jumlah[$i] <= $latestStok->stok_jumlah) {
-                    $latestStok->update([
-                        'stok_jumlah' => $latestStok->stok_jumlah - $request->jumlah[$i],
-                        'stok_tanggal' => now()
-                    ]);
-                } else {
-                    $latestStok->update([
-                        'stok_jumlah' => 0,
-                        'stok_tanggal' => now()
-                    ]);
-
-                    $sisaPengurangan = $request->jumlah[$i] - $latestStok->stok_jumlah;
-                    $this->reduceRemainingStock($barang_id, $sisaPengurangan);
+                if ($stokTersedia < $request->jumlah[$i]) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Stok barang '{$barang->barang_nama}' tidak mencukupi! (Tersedia: $stokTersedia, Diminta: {$request->jumlah[$i]})"
+                    ], 422);
                 }
-            } else {
-                StokModel::create([
+
+                // Cari entri stok terakhir untuk barang ini
+                $latestStok = StokModel::where('barang_id', $barang_id)
+                    ->latest('stok_tanggal')
+                    ->first();
+
+                if ($latestStok && $latestStok->stok_jumlah > 0) {
+                    if ($request->jumlah[$i] <= $latestStok->stok_jumlah) {
+                        $latestStok->update([
+                            'stok_jumlah' => $latestStok->stok_jumlah - $request->jumlah[$i],
+                            'stok_tanggal' => now()
+                        ]);
+                    } else {
+                        $latestStok->update([
+                            'stok_jumlah' => 0,
+                            'stok_tanggal' => now()
+                        ]);
+
+                        $sisaPengurangan = $request->jumlah[$i] - $latestStok->stok_jumlah;
+                        $this->reduceRemainingStock($barang_id, $sisaPengurangan);
+                    }
+                } else {
+                    StokModel::create([
+                        'barang_id' => $barang_id,
+                        'stok_jumlah' => -$request->jumlah[$i],
+                        'stok_tanggal' => now(),
+                        'user_id' => auth()->id()
+                    ]);
+                }
+
+                // Simpan detail penjualan dengan harga satuan
+                PenjualanDetailModel::create([
+                    'penjualan_id' => $penjualan->penjualan_id,
                     'barang_id' => $barang_id,
-                    'stok_jumlah' => -$request->jumlah[$i],
-                    'stok_tanggal' => now(),
-                    'user_id' => auth()->id()
+                    'harga' => $barang->harga_jual,
+                    'jumlah' => $request->jumlah[$i],
+                    'created_at'  => now(),
                 ]);
             }
 
-            // Simpan detail penjualan dengan harga satuan
-            PenjualanDetailModel::create([
-                'penjualan_id' => $penjualan->penjualan_id,
-                'barang_id' => $barang_id,
-                'harga' => $barang->harga_jual,
-                'jumlah' => $request->jumlah[$i],
-                'created_at'  => now(),
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Penjualan berhasil disimpan.'
             ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal menyimpan penjualan: ' . $e->getMessage()
+            ], 500);
         }
-
-        DB::commit();
-        return response()->json([
-            'status' => true,
-            'message' => 'Penjualan berhasil disimpan.'
-        ]);
-    } catch (Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => false,
-            'message' => 'Gagal menyimpan penjualan: ' . $e->getMessage()
-        ], 500);
     }
-}
 
     private function reduceRemainingStock($barang_id, $amount)
     {
@@ -345,8 +349,9 @@ public function export_excel()
     $sheet->setCellValue('E1', 'Jumlah');
     $sheet->setCellValue('F1', 'Harga');
     $sheet->setCellValue('G1', 'Yang Mencatat');
+    $sheet->setCellValue('H1', 'Harga Total');
 
-    $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+    $sheet->getStyle('A1:H1')->getFont()->setBold(true);
 
     // Isi data
     $no = 1;
@@ -355,20 +360,25 @@ public function export_excel()
     foreach ($penjualan as $item) {
         if ($item->detail && $item->detail->count() > 0) {
             foreach ($item->detail as $detail) {
+                $jumlah = $detail->jumlah ?? 0;
+                $harga = $detail->harga ?? 0;
+                $total = $jumlah * $harga;
+
                 $sheet->setCellValue('A' . $row, $no++);
                 $sheet->setCellValue('B' . $row, $detail->barang->barang_nama ?? '-');
                 $sheet->setCellValue('C' . $row, $item->penjualan_kode);
                 $sheet->setCellValue('D' . $row, Carbon::parse($item->penjualan_tanggal)->format('d-m-Y'));
-                $sheet->setCellValue('E' . $row, $detail->jumlah ?? 0);
-                $sheet->setCellValue('F' . $row, $detail->harga ?? 0);
+                $sheet->setCellValue('E' . $row, $jumlah);
+                $sheet->setCellValue('F' . $row, $harga);
                 $sheet->setCellValue('G' . $row, $item->user->nama ?? '-');
+                $sheet->setCellValue('H' . $row, $total);
                 $row++;
             }
         }
     }
 
     // Auto resize kolom
-    foreach (range('A', 'G') as $col) {
+    foreach (range('A', 'H') as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
@@ -389,6 +399,7 @@ public function export_excel()
         'Cache-Control' => 'max-age=0',
     ]);
 }
+
     public function export_pdf()
     {
         // Ambil data stok

@@ -82,7 +82,6 @@ class StokController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'supplier_id'  => 'required|exists:m_supplier,supplier_id',
-                'user_id'      => 'required|exists:m_user,user_id',
                 'barang_id'    => 'required|exists:m_barang,barang_id',
                 'stok_tanggal' => 'required|date',
                 'stok_jumlah'  => 'required|integer'
@@ -99,7 +98,7 @@ class StokController extends Controller
 
             StokModel::create([
                 'supplier_id'  => $request->supplier_id,
-                'user_id'      => $request->user_id,
+                          'user_id' => auth()->id(),
                 'barang_id'    => $request->barang_id,
                 'stok_tanggal' => $request->stok_tanggal,
                 'stok_jumlah'  => $request->stok_jumlah
@@ -247,7 +246,7 @@ class StokController extends Controller
                foreach ($data as $baris => $value) { 
                    if($baris > 1){ // baris ke 1 adalah header, maka lewati 
                        $insert[] = [
-                           'barang_id' => $value['A'],
+                            'barang_id' => $value['A'],
                             'user_id' => $value['B'],
                             'stok_tanggal' => $value['C'],
                             'stok_jumlah'  => $value['D'],

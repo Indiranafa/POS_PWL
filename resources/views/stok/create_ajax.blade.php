@@ -20,17 +20,6 @@
                     </select>
                     <small id="error-supplier_id" class="error-text form-text text-danger"></small>
                 </div>
-                <!-- Pilih User -->
-                <div class="form-group">
-                    <label>User</label>
-                    <select name="user_id" id="user_id" class="form-control" required>
-                        <option value="">- Pilih User -</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->user_id }}">{{ $user->nama }}</option>
-                        @endforeach
-                    </select>
-                    <small id="error-user_id" class="error-text form-text text-danger"></small>
-                </div>
                 <!-- Pilih Barang -->
                 <div class="form-group">
                     <label>Barang</label>

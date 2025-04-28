@@ -20,34 +20,8 @@
                     <input type="date" name="penjualan_tanggal" class="form-control" required>
                     <small id="error-penjualan_tanggal" class="error-text form-text text-danger"></small>
                 </div>
-
+                
                 <hr>
-                <h6>Barang yang Dijual</h6>
-                <div id="list-barang">
-                    <div class="barang-item mb-3">
-                        <div class="form-row mb-2">
-                            <div class="col-8">
-                                <select name="barang_id[]" class="form-control" required>
-                                    <option value="">-- Pilih Barang --</option>
-                                    @foreach ($barang as $b)
-                                        <option value="{{ $b->barang_id }}">{{ $b->barang_nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row mb-2">
-                            <div class="col-8">
-                                <input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" required>
-                            </div>
-                            <div class="col-4">
-                                <button type="button" class="btn btn-danger btn-remove">Hapus</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                {{-- <hr>
                 <h6>Barang yang Dijual</h6>
                 <div id="list-barang">
                     <div class="form-row mb-2 barang-item">
@@ -67,7 +41,7 @@
                             <button type="button" class="btn btn-danger btn-remove">Hapus</button>
                         </div>
                     </div>
-                </div> --}}
+                </div>
                 <button type="button" id="btn-tambah-barang" class="btn btn-success btn-sm mt-2">+ Tambah Barang</button>
             </div>
             <div class="modal-footer">

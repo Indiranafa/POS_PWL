@@ -30,15 +30,17 @@
 
             <table class="table table-bordered table-striped table-hover table-sm" id="table_penjualan">
                 <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Penjualan Kode</th>
-                    <th>Pembeli</th>
-                    <th>Tanggal</th>
-                    <th>User</th>
-                    <th>Aksi</th>
-                </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Penjualan Kode</th>
+                        <th>Pembeli</th>
+                        <th>Tanggal</th>
+                        <th>User</th>
+                        <th>Harga Total</th> 
+                        <th>Aksi</th>
+                    </tr>
                 </thead>
+                    
             </table>
         </div>
     </div>
@@ -71,6 +73,7 @@
                     { data: "pembeli", orderable: true, searchable: true },
                     { data: "penjualan_tanggal", orderable: true, searchable: true },
                     { data: "user_name", orderable: false, searchable: false },
+                    { data: "harga_total", orderable: true, searchable: true },
                     { data: "aksi", className: "text-center", orderable: false, searchable: false }
                 ]
             });

@@ -111,7 +111,7 @@
             <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
                     <td>{{ $s->barang->barang_nama }}</td>
-                    <td>{{ $s->user ? $s->user->username : 'N/A' }}</td>
+                    <td>{{ $s->user ? $s->user->username : '-' }}</td>
                     <td>{{ $s->stok_tanggal }}</td>
                     <td>{{ $s->stok_jumlah }}</td>
             </tr>

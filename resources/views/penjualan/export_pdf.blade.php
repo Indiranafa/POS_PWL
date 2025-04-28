@@ -6,8 +6,8 @@
     <style>
         body {
             font-family: "Times New Roman", Times, serif;
-            margin: 6px 20px;
-            line-height: 1.5;
+            margin: 6px 20px 5px 20px;
+            line-height: 15px;
         }
 
         table {
@@ -17,52 +17,88 @@
 
         td,
         th {
-            padding: 4px;
-            border: 1px solid black;
+            padding: 4px 3px;
         }
 
         th {
-            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .d-block {
+            display: block;
+        }
+
+        img.image {
+            width: auto;
+            height: 80px;
+            max-width: 150px;
+            max-height: 150px;
+        }
+
+        .text-right {
+            text-align: right;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .header-table td {
-            border: none;
+        .p-1 {
+            padding: 5px 1px 5px 1px;
         }
 
-        .logo {
-            width: 80px;
-            height: auto;
+        .font-10 {
+            font-size: 10pt;
         }
 
-        h3 {
-            margin: 10px 0;
+        .font-11 {
+            font-size: 11pt;
+        }
+
+        .font-12 {
+            font-size: 12pt;
+        }
+
+        .font-13 {
+            font-size: 13pt;
+        }
+
+        .border-bottom-header {
+            border-bottom: 1px solid;
+        }
+
+        .border-all,
+        .border-all th,
+        .border-all td {
+            border: 1px solid;
         }
     </style>
 </head>
 
 <body>
-    <table class="header-table">
+    <table class="border-bottom-header">
         <tr>
-            <td width="15%" class="text-center">
-                <img src="{{ public_path('logo_polinema.png') }}" class="logo">
-            </td>
-            <td width="85%" class="text-center">
-                <div><strong>KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</strong></div>
-                <div><strong>POLITEKNIK NEGERI MALANG</strong></div>
-                <div>Jl. Soekarno-Hatta No. 9 Malang 65141</div>
-                <div>Telepon (0341) 404424 Pes. 101-105, Fax. (0341) 404420</div>
-                <div>Laman: www.polinema.ac.id</div>
+            <td width="15%" class="text-center"><img src="{{ public_path('logo_polinema.png') }}" class="image"></td>
+
+            <td width="85%">
+                <span class="text-center d-block font-11 font-bold mb-1">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN
+                    TEKNOLOGI</span>
+
+                <span class="text-center d-block font-13 font-bold mb-1">POLITEKNIK NEGERI MALANG</span>
+
+                <span class="text-center d-block font-10">Jl. Soekarno-Hatta No. 9 Malang 65141</span>
+
+                <span class="text-center d-block font-10">Telepon (0341) 404424 Pes. 101-105, 0341-404420, Fax. (0341)
+                    404420</span>
+
+                <span class="text-center d-block font-10">Laman: www.polinema.ac.id</span>
             </td>
         </tr>
     </table>
 
     <h3 class="text-center">LAPORAN DATA PENJUALAN</h3>
 
-    <table>
+    <table class="border-all">
         <thead>
             <tr>
                 <th class="text-center">No</th>
@@ -70,6 +106,7 @@
                 <th>Kode Penjualan</th>
                 <th>User yang Melayani</th>
                 <th>Tanggal Transaksi</th>
+                <th>Total Harga</th> <!-- Kolom baru -->
             </tr>
         </thead>
         <tbody>
@@ -80,9 +117,18 @@
                 <td>{{ $s->penjualan_kode }}</td>
                 <td>{{ $s->user ? $s->user->username : 'N/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($s->penjualan_tanggal)->format('d-m-Y') }}</td>
+                <td>
+                    @php
+                        $total = $s->detail->sum(function($item) {
+                            return $item->harga * $item->jumlah;
+                        });
+                    @endphp
+                    Rp{{ number_format($total, 0, ',', '.') }}
+                </td>
             </tr>
             @endforeach
         </tbody>
+        
     </table>
 </body>
 

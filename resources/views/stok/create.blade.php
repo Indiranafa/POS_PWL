@@ -9,24 +9,6 @@
         <div class="card-body">
             <form method="POST" action="{{ url('penjualan') }}" class="form-horizontal">
                 @csrf
-                <!-- Pilih User (Jika diperlukan) -->
-                <div class="form-group row">
-                    <label class="col-2 control-label col-form-label">User</label>
-                    <div class="col-10">
-                        <select class="form-control" name="user_id" required>
-                            <option value="">- Pilih User -</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->user_id }}"
-                                    {{ old('user_id') == $user->user_id ? 'selected' : '' }}>
-                                    {{ $user->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('user_id')
-                        <small class="form-text text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-                </div>
                 <!-- Input Pembeli -->
                 <div class="form-group row">
                     <label class="col-2 control-label col-form-label">Pembeli</label>

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row pl-3 pr-3">
-        <!-- Card 1 - Total Pengguna -->
+    <!-- Card 1 - Total Pengguna -->
     <div class="col-lg-3 col-6 mb-4">
         <div class="small-box bg-info">
             <div class="inner">
@@ -54,7 +54,7 @@
     <div class="col-lg-3 col-6 mb-4">
         <div class="small-box bg-danger">
             <div class="inner">
-                <h3>{{ $totalPenjualan }}</h3>
+                <h3>Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</h3>
                 <p>Total Penjualan</p>
             </div>
             <div class="icon">
@@ -65,18 +65,17 @@
             </a>
         </div>
     </div>
-
 </div>
 
-<!-- Card for the additional diagram -->
+<!-- Grafik Penjualan -->
 <div class="card mt-4">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-chart-bar"></i> Statistik Pengguna (Per Bulan)
+            <i class="fas fa-chart-line"></i> Statistik Penjualan (Per Bulan)
         </h3>
     </div>
     <div class="card-body">
-        <canvas id="userChart" width="400" height="200"></canvas>
+        <canvas id="penjualanChart" width="800" height="200"></canvas>
     </div>
 </div>
 @endsection
@@ -84,33 +83,40 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var ctx = document.getElementById('userChart').getContext('2d');
-    var userChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'],
-            datasets: [{
-                label: 'Pengguna Aktif',
-                data: [1200, 1300, 1250, 1400, 1350, 1450],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }, {
-                label: 'Pengguna Tidak Aktif',
-                data: [300, 350, 400, 450, 500, 550],
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('penjualanChart').getContext('2d');
+        var penjualanChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @json($labelsBulan),
+                datasets: [{
+                    label: 'Total Penjualan per Bulan (Rp)',
+                    data: @json($dataPenjualan),
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            },
+                            maxTicksLimit: 6
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
                 }
             }
-        }
+        });
     });
 </script>
 @endpush
